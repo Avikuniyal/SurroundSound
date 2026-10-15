@@ -1,5 +1,8 @@
 import numpy as np
 from dac import config
+from dac import srp
+from dac.types import BearingResult
+from dac.tracker import loudness_dbfs
 
 def gcc_phat(x_i, x_j):
 
@@ -30,3 +33,13 @@ def pair_delay_s(x_i, x_j):
     cc, lags = gcc_phat(x_i, x_j)
     idxMax = np.argmax(cc)
     return (lags[idxMax] / config.FS_HZ)
+
+def estimate_bearing(block, t_s=None):
+    if (loudness_dbfs(block) < config.MIN_LEVEL_DBFS):
+        return BearingResult(None, 0.0, np.zeros(len(config.ANGLE_GRID_DEG)))
+    curves = []
+    for i, j in config.PAIRS:
+        cc, lags = gcc_phat(block[:, i], block[:, j])
+        curves.append((cc, lags))
+    bearing, conf, p = srp.srp_phat(curves)
+    return BearingResult(bearing, conf, p)
