@@ -8,3 +8,5 @@ One line per AI-written piece: file, what the AI wrote, who reviewed it.
 - 2026-10-08: harness/metrics.py, harness/run_eval.py, tests/test_harness.py (S11) written by a Claude subagent from spec 8.8. Reviewed by Srihaas; Avik's checking-rule review pending.
 - 2026-10-08: docs/DECISIONS.md T4 tuning-finding line and the PR descriptions for PRs #2 and #3 drafted by Claude. Reviewed by Srihaas.
 - 2026-10-09: GCC-PHAT synthetic experiment harness and B1 Notebook made by Claude. Reviewed by Avik. GCC-PHAT function fully made by Avik
+- 2026-10-10: dac/srp.py confidence formula (cross-pair peak agreement), CONF_AGREE_* constants in dac/config.py, new tests in tests/test_srp.py, the spec 5.4 confidence text, and the matching docs/DECISIONS.md line written by Claude; the formula was chosen after Claude compared candidate formulas on synthetic signals. Reviewed by Srihaas; Avik's checking-rule review pending.
+- 2026-10-10: GitHub issue #7 (BAND_HZ on engine-like sources) and the descriptions of this PR and issue #7 drafted by Claude, with the measurements run by Claude. Reviewed by Srihaas.
