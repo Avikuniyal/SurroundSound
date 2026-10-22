@@ -25,3 +25,9 @@ One line per AI-written piece: file, what the AI wrote, who reviewed it.
 - 2026-10-18: Function to get live audio from the microphone array to the app dac/capture.py and the test for it tests/test_capture.py made by Claude. Reviewed by Avik.
 
 - 2026-10-20: Recording Script for Static Angle Test experiments/static_angle/record.py written by Claude. Reviewed by Avik.
+
+- 2026-10-20: Live Check Script for testing the board's live audio into the bearing experiments/live_check/live_check.py written by Claude. Reviewed by Avik.
+
+- 2026-10-22: Analysis Script for Static Angle Test results experiments/static_angle/analyze.py written by Claude. Reviewed by Avik.
+
+- 2026-10-22: Trial Runner Script for Walk Test experiments/walk_test/run_trial.py written by Claude. Reviewed by Avik.
