@@ -1,3 +1,5 @@
+import queue
+
 import numpy as np
 import sounddevice as sd
 
@@ -35,20 +37,58 @@ def _find_device(substring):
                        + ' Hz. Is the array plugged in and on the raw firmware?')
 
 
+class _QueueStream:
+    def __init__(self, device):
+        self._q = queue.Queue()
+        self._left = np.zeros((0, config.N_RAW_CHANNELS), dtype=np.float32)
+        self._stream = sd.InputStream(device=device, channels=config.N_RAW_CHANNELS,
+                                      samplerate=config.FS_HZ, dtype='float32',
+                                      blocksize=config.HOP_N, callback=self._callback)
+
+    def _callback(self, indata, frames, time_info, status):
+        self._q.put((indata.copy(), bool(status.input_overflow)))
+
+    def read(self, n):
+        overflowed = False
+        while len(self._left) < n:
+            chunk, ov = self._q.get(timeout=2.0)
+            if ov:
+                overflowed = True
+            self._left = np.concatenate([self._left, chunk])
+        data = self._left[:n]
+        self._left = self._left[n:]
+        return data, overflowed
+
+    def start(self):
+        self._stream.start()
+
+    def stop(self):
+        self._stream.stop()
+
+    def close(self):
+        self._stream.close()
+
+    @property
+    def closed(self):
+        return self._stream.closed
+
+
+def _open_stream(device):
+    return _QueueStream(device)
+
+
 class LiveSource:
 
     def __init__(self, device_substring=config.DEVICE_NAME_SUBSTRING):
         self.device = _find_device(device_substring)
         self.overflows = 0
-        self._stream = sd.InputStream(device=self.device, channels=config.N_RAW_CHANNELS,
-                                      samplerate=config.FS_HZ, dtype='float32',
-                                      blocksize=config.HOP_N)
+        self._stream = _open_stream(self.device)
 
     def __iter__(self):
         hop = config.HOP_N
-        keep = config.BLOCK_N - hop    
+        keep = config.BLOCK_N - hop
         buf = np.zeros((0, config.N_MICS), dtype=np.float32)
-        n_read = 0 
+        n_read = 0
         self._stream.start()
         try:
             while True:
