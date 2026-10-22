@@ -12,3 +12,4 @@ One line per AI-written piece: file, what the AI wrote, who reviewed it.
 - 2026-10-13: Closure-Check for GCC-PHAT on real recordings written by Claude. Reviewed by Avik
 - 2026-10-10: dac/srp.py confidence formula (cross-pair peak agreement), CONF_AGREE_* constants in dac/config.py, new tests in tests/test_srp.py, the spec 5.4 confidence text, and the matching docs/DECISIONS.md line written by Claude; the formula was chosen after Claude compared candidate formulas on synthetic signals. Reviewed by Srihaas; Avik's checking-rule review pending.
 - 2026-10-10: GitHub issue #7 (BAND_HZ on engine-like sources) and the descriptions of this PR and issue #7 drafted by Claude, with the measurements run by Claude. Reviewed by Srihaas.
+- 2026-10-18: Function to get live audio from the microphone array to the app dac/capture.py and the test for it tests/test_capture.py made by Claude. Reviewed by Avik.
