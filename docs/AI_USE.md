@@ -21,3 +21,6 @@ One line per AI-written piece: file, what the AI wrote, who reviewed it.
 - 2026-10-13: Closure-Check for GCC-PHAT on real recordings written by Claude. Reviewed by Avik
 
 - 2026-10-15: Test for whether closure-check failure was caused by the board or the actual clap recordings quiet_check.py written by Claude. Reviewed by Avik.
+
+- 2026-10-18: Function to get live audio from the microphone array to the app dac/capture.py and the test for it tests/test_capture.py made by Claude. Reviewed by Avik.
+
