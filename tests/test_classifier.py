@@ -1,22 +1,34 @@
+import csv
 import tensorflow as tf
 import tensorflow_hub as hub
-import tensorflow_io as tfio
+import scipy.signal
 from tensorflow.keras import layers, models
 
-# 1. Utility function to load and preprocess audio to 16kHz Mono
-@tf.function
+
+YAMNET_HANDLE = 'https://tfhub.dev/google/yamnet/1'
 def load_wav_16k_mono(filename):
+    """Loads a WAV file, converts it to 16kHz mono without tensorflow-io."""
     file_contents = tf.io.read_file(filename)
     wav, sample_rate = tf.audio.decode_wav(file_contents, desired_channels=1)
-    wav = tf.squeeze(wav, axis=-1)
-    sample_rate = tf.cast(sample_rate, dtype=tf.int64)
-    wav = tfio.audio.resample(wav, rate_in=sample_rate, rate_out=16000)
-    return wav
+    wav = tf.squeeze(wav, axis=-1).numpy()
+    sample_rate = int(sample_rate.numpy())
 
-# 2. YAMNet Model Handle
-YAMNET_HANDLE = 'https://tfhub.dev/google/yamnet/1'
+    # Resample audio to 16000Hz using scipy
+    if sample_rate != 16000:
+        num_samples = int(len(wav) * 16000 / sample_rate)
+        wav = scipy.signal.resample(wav, num_samples)
 
-# 3. Custom Classification Head Factory
+    return tf.convert_to_tensor(wav, dtype=tf.float32)
+
+def load_yamnet_class_names(yamnet_model):
+    class_map_path = yamnet_model.class_map_path().numpy().decode('utf-8')
+    class_names = []
+    with tf.io.gfile.GFile(class_map_path) as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            class_names.append(row['display_name'])
+    return class_names
+
 def build_classifier_head():
     model = models.Sequential([
         layers.Input(shape=(1024,), dtype=tf.float32, name='embedding'),
@@ -30,7 +42,6 @@ def build_classifier_head():
     )
     return model
 
-# 4. Custom Pooling Layer for End-to-End Pipeline
 class ReduceMeanLayer(tf.keras.layers.Layer):
     def __init__(self, axis=0, **kwargs):
         super().__init__(**kwargs)
