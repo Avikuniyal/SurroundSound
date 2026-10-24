@@ -1,6 +1,12 @@
 import sys
 import tensorflow as tf
 import tensorflow_hub as hub
+import pytest
+from dac.pipeline import Pipeline
+from dac.sources import SyntheticSource
+from dac.synth import make_scenario
+from dac.stub_bearing import StubBearing
+from dac.types import ClassState
 
 from test_classifier import (
     YAMNET_HANDLE,
@@ -33,6 +39,27 @@ def predict_audio_details(audio_path, yamnet_model, custom_model, class_names):
         'yamnet_confidence': yamnet_confidence,
         'target_sound_probability': target_probability
     }
+class FakeClassifier:
+    def push(self, t_s, samples):
+        pass
+
+    def state(self):
+        return ClassState(t_s=0.0, label="other", prob_vehicle=0.0, present=False)
+
+
+def test_pipeline_l1_alert_always_false():
+    """Verify alert is always False in L1 mode, skipping TF if not installed."""
+    pytest.importorskip("tensorflow")
+
+    scenario = make_scenario("approach_0deg")
+    source = SyntheticSource(scenario)
+    stub = StubBearing(lambda t_s: scenario.truth(t_s)["bearing_deg"])
+
+    pipeline = Pipeline(bearing_fn=stub.estimate, mode="L1", classifier=FakeClassifier())
+
+    for t_s, block in source:
+        msg = pipeline.process_block(t_s, block)
+        assert msg["alert"] is False
 
 
 if __name__ == '__main__':
