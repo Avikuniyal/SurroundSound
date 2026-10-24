@@ -2,7 +2,7 @@ import csv
 import tensorflow as tf
 import tensorflow_hub as hub
 import scipy.signal
-from tensorflow.keras import layers, models
+from keras import layers, models
 
 
 YAMNET_HANDLE = 'https://tfhub.dev/google/yamnet/1'
