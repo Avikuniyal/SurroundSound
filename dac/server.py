@@ -104,7 +104,7 @@ def main():
         from dac.sources import SyntheticSource
         scenario = make_scenario(scenario_name)
         source = SyntheticSource(scenario)
-        truth_fn = scenario["truth"]["bearing_deg"]
+        truth_fn = lambda t: scenario.truth(t)["bearing_deg"]
     else:
         raise ValueError(f"Unknown source format: {args.source}")
 
