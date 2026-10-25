@@ -1,6 +1,6 @@
-// Right-hand readouts column and the approach-rule checklist, refreshed at READOUT_HZ.
+// Smoothed values for the corner readouts (drawn on canvas in compass.js), the Details panel,
+// and the screen-reader announcement. Refreshed at READOUT_HZ so numbers can be read.
 
-/* ---- Readouts (HTML), refreshed at READOUT_HZ with light smoothing ---- */
 const ema = { level: null, rate: null, trend: null };
 function smooth(key, v, a = 0.35) {
   if (v == null) {
@@ -12,60 +12,43 @@ function smooth(key, v, a = 0.35) {
 }
 const sgn = (x, d = 1) =>
   (x > 0 ? "+" : x < 0 ? "−" : "") + Math.abs(x).toFixed(d);
+
+// What the corner HUD shows; compass.js reads this every frame.
+const hud = {
+  bearing: null,
+  conf: null,
+  sound: null,
+  prob: null,
+  steady: false,
+  louder: false,
+  vehicle: false,
+};
+
 let lastSpoken = "";
 function readouts() {
   const m = current();
   if (!m) {
-    for (const id of [
-      "r-conf",
-      "r-level",
-      "r-rate",
-      "r-trend",
-      "r-class",
-      "r-bear",
-    ])
-      $(id).textContent = "—";
-    $("m-conf").style.width = "0";
-    $("m-level").style.width = "0";
-    ["c-steady", "c-louder", "c-vehicle", "c-flag"].forEach(
-      (id) => ($(id).className = "check" + (id === "c-flag" ? " flag" : "")),
-    );
-    $("flagText").textContent = "No data";
-    $("modeChip").textContent = "Mode —";
+    Object.assign(hud, { bearing: null, conf: null, sound: null, prob: null, steady: false, louder: false, vehicle: false });
+    for (const id of ["d-level", "d-rate", "d-trend", "d-prob", "d-mode"]) $(id).textContent = "—";
     return;
   }
   const L = smooth("level", m.level_dbfs, 0.3),
     R = smooth("rate", m.rate_dps),
     T = smooth("trend", m.trend_dbps);
-  $("r-conf").textContent = Math.round(m.confidence * 100) + "%";
-  $("m-conf").style.width = m.confidence * 100 + "%";
-  $("r-level").innerHTML =
-    `${(L < 0 ? "−" : "") + Math.abs(L).toFixed(0)}<small>dBFS</small>`;
-  $("m-level").style.width = clamp(((L + 70) / 70) * 100, 0, 100) + "%";
-  $("r-rate").innerHTML = R == null ? "—" : `${sgn(R, 0)}<small>°/s</small>`;
-  $("r-trend").innerHTML = T == null ? "—" : `${sgn(T)}<small>dB/s</small>`;
-  $("r-class").innerHTML =
-    `${m.class_label === "vehicle" ? "Vehicle" : "Other"}<small>${Math.round(m.class_prob * 100)}%</small>`;
-  $("r-bear").innerHTML =
-    m.bearing_smooth_deg == null
-      ? "—"
-      : `${String(Math.round(m.bearing_smooth_deg) % 360).padStart(3, "0")}<small>°</small>`;
-  $("modeChip").textContent = "Mode " + m.mode;
-  const steady = m.rate_dps != null && Math.abs(m.rate_dps) <= RATE_MAX_DPS;
-  const louder = m.trend_dbps != null && m.trend_dbps >= TREND_MIN_DBPS;
-  $("c-steady").className = "check" + (steady ? " on" : "");
-  $("c-louder").className = "check" + (louder ? " on" : "");
-  $("c-vehicle").className =
-    "check" + (m.class_label === "vehicle" ? " on" : "");
-  $("c-flag").className =
-    "check flag" + (m.alert ? " on alarm" : m.approach ? " on" : "");
-  $("flagText").textContent = m.alert
-    ? "Vehicle approaching"
-    : m.approach
-      ? "Approaching, not a vehicle"
-      : m.mode !== "L0"
-        ? "Alert off in " + m.mode
-        : "Not approaching";
+  hud.bearing = m.bearing_smooth_deg == null ? null : Math.round(m.bearing_smooth_deg) % 360;
+  hud.conf = m.bearing_smooth_deg == null ? null : Math.round(m.confidence * 100);
+  hud.sound = m.class_label === "vehicle" ? "Vehicle" : "Other";
+  hud.prob = Math.round(m.class_prob * 100);
+  hud.steady = m.rate_dps != null && Math.abs(m.rate_dps) <= RATE_MAX_DPS;
+  hud.louder = m.trend_dbps != null && m.trend_dbps >= TREND_MIN_DBPS;
+  hud.vehicle = m.class_label === "vehicle";
+
+  $("d-level").textContent = `${(L < 0 ? "−" : "") + Math.abs(L).toFixed(0)} dBFS`;
+  $("d-rate").textContent = R == null ? "—" : `${sgn(R, 0)} °/s`;
+  $("d-trend").textContent = T == null ? "—" : `${sgn(T)} dB/s`;
+  $("d-prob").textContent = m.class_prob.toFixed(2);
+  $("d-mode").textContent = m.mode + (m.mode !== "L0" ? " (alert off)" : "");
+
   const say = m.alert ? `Vehicle approaching from ${sectorName()}` : "";
   if (say !== lastSpoken) {
     $("live").textContent = say;

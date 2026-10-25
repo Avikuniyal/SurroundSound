@@ -10,6 +10,23 @@ from dac.tracker import Tracker
 from dac.types import ClassState
 
 
+def _srp_contrast(srp):
+	"""Direction energy map for the display: (P - median) / (peak - median), clipped to 0..1.
+
+	Display only. 180 values on ANGLE_GRID_DEG, all zeros for a silent block. Main peak is 1.
+	"""
+	s = np.asarray(srp, dtype=np.float64)
+	n = len(config.ANGLE_GRID_DEG)
+	if s.shape != (n,) or not np.all(np.isfinite(s)):
+		return [0.0] * n
+	med = float(np.median(s))
+	pk = float(s.max())
+	if pk - med <= 1e-9:
+		return [0.0] * n
+	c = np.clip((s - med) / (pk - med), 0.0, 1.0)
+	return [round(float(x), 2) for x in c]
+
+
 class Pipeline:
 	"""Process one overlapping audio block and produce a websocket message."""
 
@@ -49,4 +66,6 @@ class Pipeline:
 			self.classifier.push(t_s, newest_samples)
 			classification = self.classifier.state()
 
-		return fuse(track, classification, self.mode)
+		msg = fuse(track, classification, self.mode)
+		msg["srp"] = _srp_contrast(bearing.srp)  # display only: energy per direction for the ring
+		return msg

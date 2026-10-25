@@ -11,88 +11,30 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
             rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@500;600&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@500;600;700&display=swap"
         />
         <link rel="stylesheet" href="style.css" />
     </head>
     <body>
         <div class="app">
-            <div class="bar">
-                <span class="brand">Directional Audio Compass</span>
-                <span class="chip" id="conn"
-                    ><i></i><span id="connText">Connecting…</span></span
-                >
-                <span class="chip" id="modeChip">Mode L0</span>
-                <button class="chip" id="demoBtn" title="Shortcut: D">
-                    Demo feed: off
-                </button>
-                <button class="chip" id="fsBtn" title="Shortcut: F">
-                    Full screen
-                </button>
-            </div>
-            <div class="main">
-                <div class="stage">
-                    <canvas id="cv" aria-hidden="true"></canvas>
-                    <div class="alert" id="alert" role="alert" hidden>
-                        <div class="haz"></div>
-                        <div class="txt">
-                            <strong>APPROACHING</strong
-                            ><span id="alertDir"></span>
-                        </div>
-                        <div class="haz"></div>
-                    </div>
+            <div class="stage">
+                <canvas id="glow" class="glow" aria-hidden="true"></canvas>
+                <canvas id="glow2" class="glow2" aria-hidden="true"></canvas>
+                <canvas id="cv" aria-hidden="true"></canvas>
+                <header class="bar">
+                    <span class="brand">Directional Audio Compass</span>
+                    <button class="link" id="detBtn" aria-expanded="false" aria-controls="details">
+                        Details
+                    </button>
+                    <span class="live" id="conn"><i></i><span id="connText">Connecting</span></span>
+                </header>
+                <div class="details" id="details" hidden>
+                    <div><span>Level</span><b id="d-level">—</b></div>
+                    <div><span>Turning</span><b id="d-rate">—</b></div>
+                    <div><span>Loudness trend</span><b id="d-trend">—</b></div>
+                    <div><span>Vehicle score</span><b id="d-prob">—</b></div>
+                    <div><span>Mode</span><b id="d-mode">—</b></div>
                 </div>
-                <aside class="side">
-                    <div class="card ro">
-                        <div>
-                            <div class="k">Confidence</div>
-                            <div class="v" id="r-conf">—</div>
-                            <div class="meter"><b id="m-conf"></b></div>
-                        </div>
-                        <div>
-                            <div class="k">Level</div>
-                            <div class="v" id="r-level">—</div>
-                            <div class="meter"><b id="m-level"></b></div>
-                        </div>
-                        <div>
-                            <div class="k">Bearing rate</div>
-                            <div class="v" id="r-rate">—</div>
-                        </div>
-                        <div>
-                            <div class="k">Loudness trend</div>
-                            <div class="v" id="r-trend">—</div>
-                        </div>
-                        <div>
-                            <div class="k">Sound</div>
-                            <div class="v" id="r-class">—</div>
-                        </div>
-                        <div>
-                            <div class="k">Bearing</div>
-                            <div class="v" id="r-bear">—</div>
-                        </div>
-                    </div>
-                    <div class="card rule">
-                        <h3>Approach rule</h3>
-                        <div class="check" id="c-steady">
-                            <span class="box">✓</span>Steady direction (≤ 15
-                            °/s)
-                        </div>
-                        <div class="check" id="c-louder">
-                            <span class="box">✓</span>Getting louder (≥ 3 dB/s)
-                        </div>
-                        <div class="check" id="c-vehicle">
-                            <span class="box">✓</span>Sounds like a vehicle
-                        </div>
-                        <div class="check flag" id="c-flag">
-                            <span class="box">!</span
-                            ><span id="flagText">Not approaching</span>
-                        </div>
-                    </div>
-                    <p class="hint">
-                        Point the array's front toward the top of this screen.
-                        Shortcuts: F full screen, D demo feed.
-                    </p>
-                </aside>
             </div>
         </div>
         <div class="sr" aria-live="polite" id="live"></div>
