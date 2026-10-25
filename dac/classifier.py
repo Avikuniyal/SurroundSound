@@ -62,22 +62,23 @@ class ThreatClassifier:
             self.samples_since_last_eval = 0
 
     def _evaluate(self):
-        """Runs YAMNet embedding extraction and custom head inference."""
-        # YAMNet expects float32 1-D tensor of shape (N,)
+        """Runs YAMNet inference and computes vehicle probability from class scores."""
         waveform = self.tf.convert_to_tensor(self.buffer, dtype=self.tf.float32)
 
-        # 1. Extract 1024-d embeddings
-        _, embeddings, _ = self.yamnet(waveform)
+        # scores: (frames, 521), one score per YAMNet class per ~0.48 s frame
+        scores, _, _ = self.yamnet(waveform)
+        mean_scores = self.tf.reduce_mean(scores, axis=0).numpy()   # (521,)
 
-        # 2. Average embeddings across time frames
-        avg_embedding = self.tf.math.reduce_mean(embeddings, axis=0, keepdims=True)
+        # P(vehicle) = the strongest vehicle/engine class
+        prob = float(mean_scores[self.vehicle_idx].max())
 
-        # 3. Custom head prediction
-        prob = float(self.head(avg_embedding).numpy()[0][0])
+        # Temporary print for threshold tuning (Step 3)
+        print("Evaluated prob:", round(prob, 3))
+
         self.current_prob = prob
         self.has_evaluated = True
 
-        if prob >= config.CLASS_THRESH:  # 0.5
+        if prob >= config.CLASS_THRESH:
             self.last_above_thresh_t_s = self.last_t_s
 
     def state(self):
