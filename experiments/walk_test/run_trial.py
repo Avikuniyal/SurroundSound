@@ -30,9 +30,9 @@ if wav_in is None:
     src = LiveSource()
     n_blocks = int(seconds * config.FS_HZ / config.HOP_N)
     input('Enter to start ' + name + ' (' + expected + ')')
-    for k in range(3, 0, -1):
-        print(k)
-        time.sleep(1)
+    os.system('say "get to your mark"')
+    time.sleep(8)
+    os.system('say "3, 2, 1, go"')
     print('GO, start walking')
 else:
     from dac.sources import WavSource
@@ -60,6 +60,7 @@ for t_s, block in src:
 
 if wav_in is None:
     src.close()
+    os.system('say "done"')
     sf.write(os.path.join(OUT_DIR, name + '.wav'), np.concatenate(audio), config.FS_HZ)
 
 csv_path = os.path.join(OUT_DIR, name + '.csv')
