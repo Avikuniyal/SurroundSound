@@ -52,7 +52,7 @@ OFF_HOLD_S = 1.5
 # ---- Classifier, fusion, app (owner: Anirudh, PROVISIONAL) ----
 CLASS_CHANNEL = 0                 # column 0, the 45 degree mic
 CLASS_WINDOW_S = 0.96
-CLASS_THRESH = 0.5
+CLASS_THRESH = 0.3
 CLASS_HOLD_S = 3.0
 ALERT_ENABLED = True              # False puts the app in fallback level L1
 WS_HOST = 'localhost'
