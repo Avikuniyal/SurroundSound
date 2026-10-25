@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width,initial-scale=1,viewport-fit=cover"
+        />
+        <title>Directional Audio Compass</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@500;600&display=swap"
+        />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div class="app">
+            <div class="bar">
+                <span class="brand">Directional Audio Compass</span>
+                <span class="chip" id="conn"
+                    ><i></i><span id="connText">Connecting…</span></span
+                >
+                <span class="chip" id="modeChip">Mode L0</span>
+                <button class="chip" id="demoBtn" title="Shortcut: D">
+                    Demo feed: off
+                </button>
+                <button class="chip" id="fsBtn" title="Shortcut: F">
+                    Full screen
+                </button>
+            </div>
+            <div class="main">
+                <div class="stage">
+                    <canvas id="cv" aria-hidden="true"></canvas>
+                    <div class="alert" id="alert" role="alert" hidden>
+                        <div class="haz"></div>
+                        <div class="txt">
+                            <strong>APPROACHING</strong
+                            ><span id="alertDir"></span>
+                        </div>
+                        <div class="haz"></div>
+                    </div>
+                </div>
+                <aside class="side">
+                    <div class="card ro">
+                        <div>
+                            <div class="k">Confidence</div>
+                            <div class="v" id="r-conf">—</div>
+                            <div class="meter"><b id="m-conf"></b></div>
+                        </div>
+                        <div>
+                            <div class="k">Level</div>
+                            <div class="v" id="r-level">—</div>
+                            <div class="meter"><b id="m-level"></b></div>
+                        </div>
+                        <div>
+                            <div class="k">Bearing rate</div>
+                            <div class="v" id="r-rate">—</div>
+                        </div>
+                        <div>
+                            <div class="k">Loudness trend</div>
+                            <div class="v" id="r-trend">—</div>
+                        </div>
+                        <div>
+                            <div class="k">Sound</div>
+                            <div class="v" id="r-class">—</div>
+                        </div>
+                        <div>
+                            <div class="k">Bearing</div>
+                            <div class="v" id="r-bear">—</div>
+                        </div>
+                    </div>
+                    <div class="card rule">
+                        <h3>Approach rule</h3>
+                        <div class="check" id="c-steady">
+                            <span class="box">✓</span>Steady direction (≤ 15
+                            °/s)
+                        </div>
+                        <div class="check" id="c-louder">
+                            <span class="box">✓</span>Getting louder (≥ 3 dB/s)
+                        </div>
+                        <div class="check" id="c-vehicle">
+                            <span class="box">✓</span>Sounds like a vehicle
+                        </div>
+                        <div class="check flag" id="c-flag">
+                            <span class="box">!</span
+                            ><span id="flagText">Not approaching</span>
+                        </div>
+                    </div>
+                    <p class="hint">
+                        Point the array's front toward the top of this screen.
+                        Shortcuts: F full screen, D demo feed.
+                    </p>
+                </aside>
+            </div>
+        </div>
+        <div class="sr" aria-live="polite" id="live"></div>
+        <script src="js/config.js"></script>
+        <script src="js/feed.js"></script>
+        <script src="js/readouts.js"></script>
+        <script src="js/compass.js"></script>
+        <script src="js/main.js"></script>
+    </body>
+</html>

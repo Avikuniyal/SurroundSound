@@ -31,3 +31,5 @@ One line per AI-written piece: file, what the AI wrote, who reviewed it.
 - 2026-10-22: Analysis Script for Static Angle Test results experiments/static_angle/analyze.py written by Claude. Reviewed by Avik.
 
 - 2026-10-22: Trial Runner Script for Walk Test experiments/walk_test/run_trial.py written by Claude. Reviewed by Avik.
+
+- 2026-10-24: app/index.html, app/style.css and app/js/*.js (compass frontend per spec 9.4) taken from a Claude-built HTML artifact, adapted into a standalone page and split into separate files by Claude; the demo feed in it is simulated data in the spec 6.4 schema. Reviewed by Srihaas; Anirudh, who owns app/, review pending.
