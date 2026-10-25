@@ -1,5 +1,4 @@
 import csv
-import sys
 import numpy as np
 from dac import config
 from dac.types import ClassState
@@ -9,8 +8,8 @@ class ThreatClassifier:
     def __init__(self, model_dir="models/"):
         """
         Threat Classifier using YAMNet scores and vehicle class mapping.
+        Imports tensorflow lazily inside __init__ to prevent collection crashes on non-TF CI.
         """
-        import csv
         import tensorflow as tf
         import tensorflow_hub as hub
 
@@ -38,8 +37,8 @@ class ThreatClassifier:
         missing = [n for n in VEHICLE_CLASSES if n not in names]
         print("vehicle classes found:", len(self.vehicle_idx), "missing:", missing)
 
-        # Buffer setup: 0.96 seconds @ 16000 Hz = 15360 samples
-        self.window_size = int(config.CLASS_WINDOW_S * config.FS)
+        # Buffer setup using config.FS_HZ (0.96 seconds @ 16000 Hz = 15360 samples)
+        self.window_size = int(config.CLASS_WINDOW_S * config.FS_HZ)
         self.buffer = np.zeros(self.window_size, dtype=np.float32)
         self.samples_since_last_eval = 0
 
@@ -48,17 +47,9 @@ class ThreatClassifier:
         self.current_prob = 0.0
         self.last_above_thresh_t_s = -float("inf")
         self.has_evaluated = False
-        if len(sys.argv) < 3:
-            print("Usage: python make_test_wav.py <input.wav> <output_4ch.wav>")
-        sys.exit(1)
 
-        x, fs = sf.read(sys.argv[1], dtype="float32", always_2d=True)
-        x = x.mean(axis=1)                       # to mono
-        if fs != 16000:
-            x = resample_poly(x, 16000, fs).astype("float32")
-        x = x / max(1e-9, np.max(np.abs(x))) * 0.3   # normalize, no clipping
-        sf.write(sys.argv[2], np.tile(x[:, None], (1, 4)), 16000)
-        print("wrote", sys.argv[2], round(len(x) / 16000, 1), "s")
+        # Warm up YAMNet at startup to avoid lag spikes during live ingestion
+        self.yamnet(self.tf.zeros(self.window_size, dtype=self.tf.float32))
 
     def push(self, t_s, samples):
         """
