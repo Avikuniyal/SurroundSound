@@ -38,7 +38,7 @@ class ServerThread(threading.Thread):
         self.running = False
 
 
-async def broadcast_loop(server_thread, host="0.0.0.0", port=8765):
+async def broadcast_loop(server_thread, host="127.0.0.1", port=8765):
     connected_clients = set()
 
     async def handler(websocket):

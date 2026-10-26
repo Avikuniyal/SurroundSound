@@ -34,8 +34,6 @@ class ThreatClassifier:
             "Accelerating, revving, vroom", "Air brake", "Reversing beeps",
         ]
         self.vehicle_idx = [i for i, n in enumerate(names) if n in VEHICLE_CLASSES]
-        missing = [n for n in VEHICLE_CLASSES if n not in names]
-        print("vehicle classes found:", len(self.vehicle_idx), "missing:", missing)
 
         # Buffer setup using config.FS_HZ (0.96 seconds @ 16000 Hz = 15360 samples)
         self.window_size = int(config.CLASS_WINDOW_S * config.FS_HZ)
@@ -81,8 +79,6 @@ class ThreatClassifier:
         # P(vehicle) = the strongest vehicle/engine class
         prob = float(mean_scores[self.vehicle_idx].max())
         
-        # Temporary print for threshold tuning
-        print("Evaluated prob:", round(prob, 3))
 
         self.current_prob = prob
         self.has_evaluated = True
