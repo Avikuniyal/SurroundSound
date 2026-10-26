@@ -80,6 +80,7 @@ const PAL = {
    above   = smoothed level minus floor, in dB
    gate    opens at floor + GATE_ON_DB, closes below floor + GATE_OFF_DB, and fades in/out
    returns loud 0..1 for the ring: 0 when closed, grows with how far above the floor the sound is */
+let gateAbove = null; // dB above the room floor, for the LOUDNESS corner
 let lvlSm = null,
   floorDb = null,
   gateOn = false,
@@ -87,6 +88,7 @@ let lvlSm = null,
 function soundGate(m, dt) {
   if (!m) {
     lvlSm = null;
+    gateAbove = null;
     gateOn = false;
     gateVal = 0;
     return 0;
@@ -97,6 +99,7 @@ function soundGate(m, dt) {
   else if (lvlSm < floorDb) floorDb += (lvlSm - floorDb) * (1 - Math.exp(-dt / 0.3));
   else floorDb = Math.min(lvlSm, floorDb + GATE_FLOOR_RISE * dt);
   const above = lvlSm - floorDb;
+  gateAbove = above;
   if (above >= GATE_ON_DB) gateOn = true;
   else if (above < GATE_OFF_DB) gateOn = false;
   if (m.alert || m.approach) gateOn = true; // never hide a sound the tracker is acting on
@@ -416,7 +419,7 @@ function drawHud(C, u) {
     c.fillText(val, x, y + 25 * u);
   };
   corner("BEARING", hud.bearing == null ? "—" : hud.bearing + "°", pad, topY, "left");
-  corner("CONFIDENCE", hud.conf == null ? "—" : hud.conf + "%", W - pad, topY, "right");
+  corner("LOUDNESS", hud.loud == null ? "—" : "+" + hud.loud + " dB", W - pad, topY, "right");
   corner("SOUND", hud.sound == null ? "—" : hud.sound, pad, botY, "left");
   if (hud.sound != null) {
     c.font = valF;

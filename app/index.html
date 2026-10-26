@@ -6,7 +6,7 @@
             name="viewport"
             content="width=device-width,initial-scale=1,viewport-fit=cover"
         />
-        <title>Directional Audio Compass</title>
+        <title>SurroundSound</title>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
@@ -22,13 +22,14 @@
                 <canvas id="glow2" class="glow2" aria-hidden="true"></canvas>
                 <canvas id="cv" aria-hidden="true"></canvas>
                 <header class="bar">
-                    <span class="brand">Directional Audio Compass</span>
+                    <span class="brand">SurroundSound</span>
                     <button class="link" id="detBtn" aria-expanded="false" aria-controls="details">
                         Details
                     </button>
                     <span class="live" id="conn"><i></i><span id="connText">Connecting</span></span>
                 </header>
                 <div class="details" id="details" hidden>
+                    <div><span>Confidence</span><b id="d-conf">—</b></div>
                     <div><span>Level</span><b id="d-level">—</b></div>
                     <div><span>Turning</span><b id="d-rate">—</b></div>
                     <div><span>Loudness trend</span><b id="d-trend">—</b></div>

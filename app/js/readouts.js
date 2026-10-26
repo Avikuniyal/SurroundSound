@@ -17,6 +17,7 @@ const sgn = (x, d = 1) =>
 const hud = {
   bearing: null,
   conf: null,
+  loud: null, // dB above the room, only while the ring is lit (a real sound)
   sound: null,
   prob: null,
   steady: false,
@@ -28,8 +29,8 @@ let lastSpoken = "";
 function readouts() {
   const m = current();
   if (!m) {
-    Object.assign(hud, { bearing: null, conf: null, sound: null, prob: null, steady: false, louder: false, vehicle: false });
-    for (const id of ["d-level", "d-rate", "d-trend", "d-prob", "d-mode"]) $(id).textContent = "—";
+    Object.assign(hud, { bearing: null, conf: null, loud: null, sound: null, prob: null, steady: false, louder: false, vehicle: false });
+    for (const id of ["d-conf", "d-level", "d-rate", "d-trend", "d-prob", "d-mode"]) $(id).textContent = "—";
     return;
   }
   const L = smooth("level", m.level_dbfs, 0.3),
@@ -37,6 +38,8 @@ function readouts() {
     T = smooth("trend", m.trend_dbps);
   hud.bearing = m.bearing_smooth_deg == null ? null : Math.round(m.bearing_smooth_deg) % 360;
   hud.conf = m.bearing_smooth_deg == null ? null : Math.round(m.confidence * 100);
+  hud.loud = gateAbove != null && gateVal > 0.5 ? Math.max(0, Math.round(gateAbove)) : null;
+  $("d-conf").textContent = hud.conf == null ? "—" : hud.conf + "%";
   hud.sound = m.class_label === "vehicle" ? "Vehicle" : "Other";
   hud.prob = Math.round(m.class_prob * 100);
   hud.steady = m.rate_dps != null && Math.abs(m.rate_dps) <= RATE_MAX_DPS;
